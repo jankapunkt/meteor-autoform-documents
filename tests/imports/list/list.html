@@ -1,0 +1,31 @@
+<template name="list">
+    {{#unless loadComplete}}
+        <div class="well well-lg clearfix">
+            <span class="pull-right">
+                <i class="fa fa-fw fa-spinner fa-pulse"></i>
+            </span>
+            <span>Loading...</span>
+        </div>
+    {{/unless}}
+    <ul class="list-group">
+        {{#each documents}}
+            <li class="list-group-item">
+                    <span class="pull-right">
+                        <button class="btn btn-sm btn-default" data-target="{{this._id}}">
+                            <i class="fa fa-fw fa-pencil"></i>
+                        </button>
+                    </span>
+                <span>
+                        <strong>{{this.title}}</strong><br>
+                        <small>{{this.description}}</small>
+                    </span>
+            </li>
+            {{else}}
+            <li class="list-group-item">
+                <div class="jumbotron">
+                    <h4 class="center">No documents yet in collection.</h4>
+                </div>
+            </li>
+        {{/each}}
+    </ul>
+</template>

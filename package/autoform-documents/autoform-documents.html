@@ -1,0 +1,75 @@
+<template name="afDocuments">
+    {{#unless loadComplete}}
+        ...
+    {{else}}
+        <span class="pull-right">
+            <button class="btn btn-sm {{#if listMode}}btn-info{{else}}btn-default{{/if}} afDocumentsSelectButtons ">
+                <i class="fa fa-fw fa-list-ul"></i>
+            </button>
+            <button class="btn btn-sm btn-success afDocumentsAddButton">
+                <i class="fa fa-plus"></i> <i class="fa fa-file-o"></i>
+            </button>
+        </span>
+        <br><br>
+        <div class="panel panel-default">
+            {{#unless listMode}}
+                <ul class="list-group">
+                    {{#if target}}
+                        <li class="list-group-item list-group-item-info afDocumentsClickable afDocumentsFirstOption">
+
+                        <span class="pull-right">
+                        <i class="fa fa-fw fa-file-o"></i>
+                    </span>
+                            <span><strong>{{targetLabel}}</strong></span>
+                        </li>
+                    {{else}}
+                        <li class="list-group-item afDocumentsClickable afDocumentsFirstOption text-muted">
+                            {{firstOption}}
+                        </li>
+                    {{/if}}
+
+                </ul>
+            {{else}}
+                <ul class="list-group afDocumentsListGroup">
+                    <li class="list-group-item afDocumentsClickable afDocumentsSelectButtons afDocumentsUnselect text-muted">
+                        {{firstOption}}
+                    </li>
+                    {{#each documents}}
+                        <li class="list-group-item {{#if isSelected this.value}}list-group-item-info{{/if}} clearfix afDocumentsEntry afDocumentsClickable"
+                            data-target="{{this.value}}" data-label="{{this.label}}">
+                            <button class="afDocumentsEditButton btn btn-sm btn-default pull-right" data-target="{{this.value}}">
+                                <i class="fa fa-fw fa-pencil"></i>
+                            </button>
+                            <span><strong>{{this.label}}</strong></span>
+                        </li>
+                    {{/each}}
+                </ul>
+            {{/unless}}
+        </div>
+    {{/unless}}
+    <!-- Modal -->
+    <div class="afDocumentsFormModal modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <strong>{{label}}</strong>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    {{#if editTarget}}
+                        {{> quickForm id="afDocumentsExternalDocEditForm" schema=extSchema type="normal" doc=editTarget}}
+                    {{/if}}
+                    {{#if insertTarget}}
+                        {{> quickForm id="afDocumentsExternalDocInsertForm" schema=extSchema type="normal"}}
+                    {{/if}}
+                </div>
+                <div class="modal-footer"></div>
+            </div>
+
+        </div>
+    </div>
+    <!-- autoform related -->
+    <input type="hidden" id="afDocumentHiddenInput" data-schema-key="{{dataSchemaKey}}"/>
+</template>

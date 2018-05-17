@@ -1,0 +1,30 @@
+{
+  "extends": "@meteorjs/eslint-config-meteor",
+  "env": {
+    "es6": true,
+    "shared-node-browser": true,
+    "node": true,
+    "meteor": true,
+    "mocha": true,
+    "browser": true
+  },
+  "globals": {
+    "AutoForm": true,
+    "sinon": true,
+    "assert": true
+  },
+  "plugins": [
+    "compat"
+  ],
+  "rules": {
+    "import/prefer-default-export": "off",
+    "import/no-unresolved": "off",
+    "valid-typeof": [
+      "error",
+      {
+        "requireStringLiterals": false
+      }
+    ],
+    "no-underscore-dangle": "off"
+  }
+}

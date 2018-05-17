@@ -1,0 +1,40 @@
+<head>
+    <title>tests</title>
+</head>
+
+<body>
+{{> main}}
+</body>
+
+<template name="main">
+    <div class="container">
+        <h1 class="text-center">Meteor Autoform-Documents Package</h1>
+        <hr>
+
+        <ul class="nav nav-tabs clearfix">
+            <li class="{{#if showDocuments 'a'}}active{{/if}}">
+                <a href class="nav-tab" data-target="a">Documents A</a>
+            </li>
+            <li class="{{#if showDocuments 'b'}}active{{/if}}">
+                <a href class="nav-tab" data-target="b">Documents B</a>
+            </li>
+            <li class="pull-right">
+                <a id="new-entry" href class="btn btn-success">new</a>
+            </li>
+        </ul>
+        <br>
+
+        {{#if showInsert}}
+            {{> quickForm id="insertForm" schema=schema type="normal"}}
+        {{/if}}
+
+        {{#if showDocuments 'a'}}
+            {{> list collection=(collection 'a')}}
+        {{/if}}
+
+        {{#if showDocuments 'b'}}
+            {{> list collection=(collection 'b')}}
+        {{/if}}
+    </div>
+</template>
+
