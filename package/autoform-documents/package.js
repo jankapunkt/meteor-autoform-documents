@@ -16,7 +16,6 @@ Package.onUse(function (api) {
   api.use('templating@1.3.2')
   api.use('underscore')
   api.use('random')
-  api.use('jquery')
   api.use('tracker')
   api.use('reactive-dict')
   api.use('dburles:mongo-collection-instances@0.3.5')
