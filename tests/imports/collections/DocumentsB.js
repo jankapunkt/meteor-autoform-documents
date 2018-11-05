@@ -1,10 +1,10 @@
-import { Mongo } from 'meteor/mongo';
+import { Mongo } from 'meteor/mongo'
 
 const methods = {
   get: { name: 'docsb.get' },
   insert: { name: 'docsb.insert' },
   update: { name: 'docsb.update' },
-};
+}
 
 export const DocumentsB = {
   name: 'documentsb',
@@ -13,8 +13,9 @@ export const DocumentsB = {
   schema: {
     title: String,
     description: String,
-  }
-};
+  },
+  publication: 'docsb.all'
+}
 
-export const DocumentsBCollection = new Mongo.Collection(DocumentsB.name);
-DocumentsBCollection.schema = DocumentsB.schema;
+export const DocumentsBCollection = new Mongo.Collection(DocumentsB.name)
+DocumentsBCollection.schema = DocumentsB.schema

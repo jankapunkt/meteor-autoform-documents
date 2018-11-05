@@ -9,32 +9,41 @@
 <template name="main">
     <div class="container">
         <h1 class="text-center">Meteor Autoform-Documents Package</h1>
-        <hr>
+        <div class="card">
+            {{#unless loadComplete}}
+                <i class="fa fa-spinner fa-pulse"></i> Loading...
+            {{/unless}}
+            <div class="card-header">
+                <a href id="new-entry" class="float-right">+ new</a>
+                <ul class="nav nav-tabs card-header-tabs">
+                    <li class="nav-item">
+                        <a href class="nav-link nav-tab {{#if showDocuments 'a'}}active{{/if}}"
+                           data-target="a">Documents A</a>
+                    </li>
+                    <li class="nav-item ">
+                        <a href class="nav-link nav-tab {{#if showDocuments 'b'}}active{{/if}}"
+                           data-target="b">Documents B</a>
+                    </li>
+                </ul>
+            </div>
+            {{#if showInsert}}
+                <div class="card-body">
+                    {{> quickForm id="insertForm" schema=schema type="normal"}}
+                </div>
+            {{/if}}
+            {{#with editTarget}}
+                <div class="card-body">
+                    {{> quickForm id="updateForm" schema=schema type="normal" doc=(doc this)}}
+                </div>
+            {{/with}}
+            {{#if showDocuments 'a'}}
+                {{> list collection=(collection 'a')}}
+            {{/if}}
 
-        <ul class="nav nav-tabs clearfix">
-            <li class="{{#if showDocuments 'a'}}active{{/if}}">
-                <a href class="nav-tab" data-target="a">Documents A</a>
-            </li>
-            <li class="{{#if showDocuments 'b'}}active{{/if}}">
-                <a href class="nav-tab" data-target="b">Documents B</a>
-            </li>
-            <li class="pull-right">
-                <a id="new-entry" href class="btn btn-success">new</a>
-            </li>
-        </ul>
-        <br>
-
-        {{#if showInsert}}
-            {{> quickForm id="insertForm" schema=schema type="normal"}}
-        {{/if}}
-
-        {{#if showDocuments 'a'}}
-            {{> list collection=(collection 'a')}}
-        {{/if}}
-
-        {{#if showDocuments 'b'}}
-            {{> list collection=(collection 'b')}}
-        {{/if}}
+            {{#if showDocuments 'b'}}
+                {{> list collection=(collection 'b')}}
+            {{/if}}
+        </div>
     </div>
 </template>
 

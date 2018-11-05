@@ -1,45 +1,43 @@
-import { Template } from 'meteor/templating';
-import { ReactiveDict } from 'meteor/reactive-dict';
-import { Session } from 'meteor/session';
+import { Template } from 'meteor/templating'
+import { ReactiveDict } from 'meteor/reactive-dict'
 
-import './list.html';
+import { SharedState } from '../shared/SharedState'
+import './list.html'
 
 Template.list.onCreated(function () {
-  const instance = this;
-  instance.state = new ReactiveDict();
+  const instance = this
+  instance.state = new ReactiveDict()
   instance.autorun(function () {
-    instance.state.set('loadComplete', false);
-    const data = Template.currentData();
-    instance.state.set('collection', data.collection);
-    instance.state.set('loadComplete', true);
-  });
-});
+    instance.state.set('loadComplete', false)
+    const data = Template.currentData()
+    instance.state.set('collection', data.collection)
+    instance.state.set('loadComplete', true)
+  })
+})
 
 Template.list.helpers({
-  documents() {
-    const collectionName = Template.instance().state.get('collection');
-    if (!collectionName) return null;
-    return Mongo.Collection.get(collectionName).find();
+  documents () {
+    const collectionName = Template.instance().state.get('collection')
+    if (!collectionName) return null
+    return Mongo.Collection.get(collectionName).find()
   },
-  showInsert() {
-    return Template.instance().state.get('showInsert');
+  showInsert () {
+    return Template.instance().state.get('showInsert')
   },
-  loadComplete() {
-    return Template.instance().state.get('loadComplete');
+  loadComplete () {
+    return Template.instance().state.get('loadComplete')
   },
-  collectionSchema() {
-    const collectionName = Template.instance().state.get('collection');
-    if (!collectionName) return null;
-    return Mongo.Collection.get(collectionName).schema;
+  collectionSchema () {
+    const collectionName = Template.instance().state.get('collection')
+    if (!collectionName) return null
+    return Mongo.Collection.get(collectionName).schema
   }
-});
+})
 
 Template.main.events({
-
-  'click .edit-entry'(event) {
-    event.preventDefault();
-    const target = $(event.currentTarget).attr('data-target');
-    Session.set("editTarget", target);
-  },
-
-});
+  'click .list-edit-entry-button' (event) {
+    event.preventDefault()
+    const target = $(event.currentTarget).attr('data-target')
+    SharedState.set('editTarget', target)
+  }
+})

@@ -2,9 +2,14 @@
     cursor: pointer;
 }
 
-.afDocumentsListGroup {
-    max-height: 300px;
+.afDocumentsCard {
+    border: 0.5px;
+}
+
+.afDocumentsScrollContainer {
+    max-height: 500px;
     margin-bottom: 10px;
-    overflow:scroll;
+    overflow-y: scroll;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
 }

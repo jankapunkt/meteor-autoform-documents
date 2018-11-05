@@ -1,51 +1,66 @@
+<template name="afDocumentsAddButton">
+    <span class="pull-right">
+        <button class="btn btn-sm btn-success afDocumentsAddButton">
+            <i class="fa fa-plus"></i> <i class="fa fa-file-o"></i>
+        </button>
+    </span>
+</template>
+
 <template name="afDocuments">
     {{#unless loadComplete}}
-        ...
+        <div class="card">
+            <div class="card-title text-center">
+                <i class="fa fa-fw fa-spinner fa-pulse"></i>
+            </div>
+        </div>
     {{else}}
-        <span class="pull-right">
-            <button class="btn btn-sm {{#if listMode}}btn-info{{else}}btn-default{{/if}} afDocumentsSelectButtons ">
-                <i class="fa fa-fw fa-list-ul"></i>
-            </button>
-            <button class="btn btn-sm btn-success afDocumentsAddButton">
-                <i class="fa fa-plus"></i> <i class="fa fa-file-o"></i>
-            </button>
-        </span>
-        <br><br>
-        <div class="panel panel-default">
-            {{#unless listMode}}
+        {{#unless listMode}}
+            <div class="card afDocumentsCard">
                 <ul class="list-group">
                     {{#if target}}
-                        <li class="list-group-item list-group-item-info afDocumentsClickable afDocumentsFirstOption">
-
-                        <span class="pull-right">
-                        <i class="fa fa-fw fa-file-o"></i>
-                    </span>
+                        <li class="list-group-item afDocumentsClickable afDocumentsFirstOption">
+                            {{> afDocumentsAddButton}}
                             <span><strong>{{targetLabel}}</strong></span>
                         </li>
                     {{else}}
                         <li class="list-group-item afDocumentsClickable afDocumentsFirstOption text-muted">
+                            {{> afDocumentsAddButton}}
                             {{firstOption}}
                         </li>
                     {{/if}}
-
                 </ul>
-            {{else}}
+            </div>
+        {{else}}
+            <div class="card afDocumentsCard afDocumentsScrollContainer">
                 <ul class="list-group afDocumentsListGroup">
                     <li class="list-group-item afDocumentsClickable afDocumentsSelectButtons afDocumentsUnselect text-muted">
+                        {{> afDocumentsAddButton}}
                         {{firstOption}}
                     </li>
                     {{#each documents}}
-                        <li class="list-group-item {{#if isSelected this.value}}list-group-item-info{{/if}} clearfix afDocumentsEntry afDocumentsClickable"
-                            data-target="{{this.value}}" data-label="{{this.label}}">
-                            <button class="afDocumentsEditButton btn btn-sm btn-default pull-right" data-target="{{this.value}}">
-                                <i class="fa fa-fw fa-pencil"></i>
-                            </button>
-                            <span><strong>{{this.label}}</strong></span>
-                        </li>
+                        {{#if isSelected this.value}}
+                            <li class="list-group-item list-group-item-primary clearfix afDocumentsClickable li-{{this.value}}"
+                                data-target="{{this.value}}" data-label="{{this.label}}">
+                                <span class="float-right">
+                                    <button class="afDocumentsApplyButton btn btn-sm btn-secondary" data-target="{{this.value}}">
+                                        <i class="fa fa-fw fa-check"></i>
+                                    </button>
+                                    <button class="afDocumentsEditButton btn btn-sm btn-secondary" data-target="{{this.value}}">
+                                        <i class="fa fa-fw fa-pencil"></i>
+                                    </button>
+                                    </span>
+                                <span><strong>{{this.label}}</strong></span>
+                            </li>
+                        {{else}}
+                            <li class="list-group-item afDocumentsEntry afDocumentsClickable"
+                                data-target="{{this.value}}" data-label="{{this.label}}">
+                                <span><strong>{{this.label}}</strong></span>
+                            </li>
+                        {{/if}}
                     {{/each}}
                 </ul>
-            {{/unless}}
-        </div>
+            </div>
+        {{/unless}}
     {{/unless}}
     <!-- Modal -->
     <div class="afDocumentsFormModal modal fade" role="dialog">
