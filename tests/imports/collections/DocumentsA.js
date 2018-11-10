@@ -14,7 +14,6 @@ export const DocumentsA = {
         type: 'documents',
         collection: DocumentsB.name,
         label: DocumentsB.label,
-        labelField: 'title',
         firstOption: 'select one',
         schema: DocumentsB.schema,
         methods: {
@@ -28,7 +27,8 @@ export const DocumentsA = {
             .fetch()
             .map(el => ({
               value: el._id,
-              label: el.title
+              label: el.title,
+              description: el.description
             }))
             .sort((a, b) => a.label.localeCompare(b.label))
         }
