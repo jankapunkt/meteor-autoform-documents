@@ -49,7 +49,8 @@ Template.afDocuments.onCreated(function () {
     instance.state.set('firstOption', atts.firstOption)
     instance.state.set('loadComplete', true)
 
-    if (data.value) {
+    const currentTarget = instance.state.get('target')
+    if (!currentTarget && data.value) {
       instance.state.set('target', data.value)
     }
   })
@@ -131,11 +132,15 @@ Template.afDocuments.events({
   'click .afDocumentsEditButton' (event, templateInstance) {
     event.preventDefault()
     event.stopPropagation()
-    const target = $(event.currentTarget).attr('data-target')
+    const targetId = $(event.currentTarget).attr('data-target')
     templateInstance.state.set('insertTarget', false)
     const getDocMethodName = templateInstance.state.get('getDocMethodName')
-    Meteor.call(getDocMethodName, { _id: target }, (err, res) => {
-      templateInstance.state.set('editTarget', res)
+    Meteor.call(getDocMethodName, { _id: targetId }, (err, res) => {
+      if (err) {
+        console.error(err)
+      } else {
+        templateInstance.state.set('editTarget', res)
+      }
     })
     $('.afDocumentsFormModal').modal('show')
   },
@@ -158,16 +163,16 @@ Template.afDocuments.events({
     event.preventDefault()
     const values = AutoForm.getFormValues('afDocumentsExternalDocInsertForm')
     const insertMethodName = templateInstance.state.get('insertDocMethodName')
-    Meteor.call(insertMethodName, values.insertDoc, (err, res) => {
+    Meteor.call(insertMethodName, values.insertDoc, (err, docId) => {
       if (err) {
         console.error(err)
-        return
+      } else {
+        templateInstance.state.set('updated', true)
+        templateInstance.state.set('target', docId)
+        templateInstance.state.set('insertTarget', false)
+        templateInstance.state.set('listMode', false)
+        $('.afDocumentsFormModal').modal('hide')
       }
-      templateInstance.state.set('target', res)
-      templateInstance.state.set('insertTarget', false)
-      templateInstance.state.set('listMode', false)
-      templateInstance.state.set('updated', true)
-      $('.afDocumentsFormModal').modal('hide')
     })
   },
   'submit #afDocumentsExternalDocEditForm' (event, templateInstance) {
