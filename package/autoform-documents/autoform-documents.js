@@ -1,7 +1,7 @@
+/* global AutoForm */
 import { Meteor } from 'meteor/meteor'
 import { Tracker } from 'meteor/tracker'
 import { Template } from 'meteor/templating'
-import { Random } from 'meteor/random'
 import { ReactiveDict } from 'meteor/reactive-dict'
 import { $ } from 'meteor/jquery'
 
@@ -28,7 +28,6 @@ Template.afDocuments.onCreated(function () {
   instance.state = new ReactiveDict()
   instance.state.set('listMode', false)
   instance.autorun(() => {
-
     // trigger new autorun
     const updated = instance.state.get('updated')
     if (updated) {
@@ -185,5 +184,5 @@ Template.afDocuments.events({
         $('.afDocumentsFormModal').modal('hide')
       }
     })
-  },
+  }
 })
