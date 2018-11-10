@@ -1,6 +1,7 @@
+/* eslint-env meteor */
 Package.describe({
   name: 'jkuester:autoform-documents',
-  version: '1.1.0',
+  version: '1.2.0',
   // Brief, one-line summary of the package.
   summary: 'Select or create documents and link them in your current form.',
   // URL to the Git repository containing the source code for this package.
@@ -23,6 +24,6 @@ Package.onUse(function (api) {
   api.addFiles([
     'autoform-documents.html',
     'autoform-documents.css',
-    'autoform-documents.js',
+    'autoform-documents.js'
   ], 'client')
 })
