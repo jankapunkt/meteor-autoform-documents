@@ -90,13 +90,10 @@ Template.afDocuments.helpers({
     return Template.instance().state.get('target') === id
   },
   target () {
-    return Template.instance().state.get('target')
-  },
-  targetLabel () {
     const target = Template.instance().state.get('target')
+    if (!target) return null
     const selectOptions = Template.instance().state.get('selectOptions')
-    const doc = selectOptions.find(el => el.value === target)
-    return doc && doc.label
+    return selectOptions.find(entry => entry.value === target)
   },
   insertTarget () {
     return Template.instance().state.get('insertTarget')

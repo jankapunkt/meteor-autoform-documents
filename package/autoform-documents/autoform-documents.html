@@ -17,17 +17,20 @@
         {{#unless listMode}}
             <div class="card afDocumentsCard">
                 <ul class="list-group">
-                    {{#if target}}
+                    {{#with target}}
                         <li class="list-group-item afDocumentsClickable afDocumentsFirstOption">
                             {{> afDocumentsAddButton}}
-                            <span><strong>{{targetLabel}}</strong></span>
+                            <span><strong>{{this.label}}</strong></span>
+                            {{#if this.description}}
+                                <br><span><small>{{this.description}}</small></span>
+                            {{/if}}
                         </li>
                     {{else}}
                         <li class="list-group-item afDocumentsClickable afDocumentsFirstOption text-muted">
                             {{> afDocumentsAddButton}}
                             {{firstOption}}
                         </li>
-                    {{/if}}
+                    {{/with}}
                 </ul>
             </div>
         {{else}}
