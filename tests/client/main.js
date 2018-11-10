@@ -21,14 +21,14 @@ AutoForm.setDefaultTemplate('bootstrap4')
 const schemaA = new SimpleSchema(DocumentsA.schema, { tracker: Tracker })
 const schemaB = new SimpleSchema(DocumentsB.schema, { tracker: Tracker })
 
-const docsASub = Meteor.subscribe(DocumentsA.publication)
-const docsBSub = Meteor.subscribe(DocumentsB.publication)
-
 Template.main.onCreated(function () {
   const instance = this
   instance.state = new ReactiveDict()
   instance.state.set('showDocuments', 'a')
   instance.autorun(function () {
+    console.log('autorun', new Date())
+    const docsASub = instance.subscribe(DocumentsA.publication)
+    const docsBSub = instance.subscribe(DocumentsB.publication)
 
     if (docsASub.ready()) {
       instance.state.set('docsAReady', true)

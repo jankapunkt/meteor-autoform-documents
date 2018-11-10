@@ -26,7 +26,10 @@ export const DocumentsA = {
           return DocumentsBCollection
             .find({})
             .fetch()
-            .map(el => ({ value: el._id, label: el.title }))
+            .map(el => ({
+              value: el._id,
+              label: el.title
+            }))
             .sort((a, b) => a.label.localeCompare(b.label))
         }
       }

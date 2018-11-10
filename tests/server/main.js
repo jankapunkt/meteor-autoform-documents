@@ -30,6 +30,8 @@ Meteor.methods({
   [ DocumentsB.methods.update.name ] (updateDoc) {
     // security checks are all
     // up to you ....
-    return DocumentsBCollection.update(updateDoc._id, updateDoc.modifier)
-  },
+    const updated = DocumentsBCollection.update(updateDoc._id, updateDoc.modifier)
+    console.log(updated, updateDoc)
+    return updated
+  }
 })
