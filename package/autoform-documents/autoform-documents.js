@@ -18,7 +18,7 @@ AutoForm.addInputType('documents', {
   },
   valueIn (initialValue) {
     return initialValue
-  },
+  }
 })
 
 let extSchema
@@ -35,7 +35,7 @@ Template.afDocuments.onCreated(function () {
       instance.state.set('updated', false)
     }
 
-    const { data } = instance
+    const data = Template.currentData()
     const { atts } = data
     const { methods } = atts
 
