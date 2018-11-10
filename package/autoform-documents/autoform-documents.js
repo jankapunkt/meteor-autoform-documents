@@ -27,6 +27,10 @@ Template.afDocuments.onCreated(function () {
   const instance = this
   instance.state = new ReactiveDict()
   instance.state.set('listMode', false)
+  if (instance.data.value) {
+    instance.state.set('target', instance.data.value)
+  }
+
   instance.autorun(() => {
     // trigger new autorun
     const updated = instance.state.get('updated')
@@ -48,11 +52,6 @@ Template.afDocuments.onCreated(function () {
     instance.state.set('updateDocMethodName', methods.update)
     instance.state.set('firstOption', atts.firstOption)
     instance.state.set('loadComplete', true)
-
-    const currentTarget = instance.state.get('target')
-    if (!currentTarget && data.value) {
-      instance.state.set('target', data.value)
-    }
   })
 })
 
