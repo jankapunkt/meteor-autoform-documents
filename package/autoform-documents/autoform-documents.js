@@ -1,11 +1,10 @@
-/* global AutoForm */
 import { Meteor } from 'meteor/meteor'
 import { Random } from 'meteor/random'
 import { Tracker } from 'meteor/tracker'
 import { Template } from 'meteor/templating'
 import { ReactiveDict } from 'meteor/reactive-dict'
 import { $ } from 'meteor/jquery'
-
+import { formIsValid } from './helpers'
 import SimpleSchema from 'simpl-schema'
 
 import './autoform-documents.css'
@@ -206,8 +205,10 @@ Template.afDocuments.events({
   },
   'submit #afDocumentsExternalDocInsertForm' (event, templateInstance) {
     event.preventDefault()
-    const values = AutoForm.getFormValues('afDocumentsExternalDocInsertForm')
-    templateInstance.callMethod(MethodNames.insert, values.insertDoc, docId => {
+    const insertDoc = formIsValid(extSchema, 'afDocumentsExternalDocInsertForm')
+    if (!insertDoc) return
+
+    templateInstance.callMethod(MethodNames.insert, insertDoc, docId => {
       templateInstance.state.set('updated', true)
       templateInstance.state.set('target', docId)
       templateInstance.state.set('insertTarget', false)
@@ -217,9 +218,11 @@ Template.afDocuments.events({
   },
   'submit #afDocumentsExternalDocEditForm' (event, templateInstance) {
     event.preventDefault()
-    const values = AutoForm.getFormValues('afDocumentsExternalDocEditForm')
+    const updateDoc = formIsValid(extSchema, 'afDocumentsExternalDocEditForm', true)
+    if (!updateDoc) return
+
     const editTarget = templateInstance.state.get('editTarget')
-    templateInstance.callMethod(MethodNames.update, { _id: editTarget._id, modifier: values.updateDoc }, () => {
+    templateInstance.callMethod(MethodNames.update, { _id: editTarget._id, modifier: updateDoc }, () => {
       templateInstance.state.set('editTarget', null)
       templateInstance.state.set('updated', true)
       $('.afDocumentsFormModal').modal('hide')
