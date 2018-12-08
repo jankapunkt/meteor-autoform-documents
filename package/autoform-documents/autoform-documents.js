@@ -1,5 +1,6 @@
 /* global AutoForm */
 import { Meteor } from 'meteor/meteor'
+import { Random } from 'meteor/random'
 import { Tracker } from 'meteor/tracker'
 import { Template } from 'meteor/templating'
 import { ReactiveDict } from 'meteor/reactive-dict'
@@ -7,28 +8,82 @@ import { $ } from 'meteor/jquery'
 
 import SimpleSchema from 'simpl-schema'
 
-import './autoform-documents.html'
 import './autoform-documents.css'
-
-// extend autoform with bpmn modeler
-AutoForm.addInputType('documents', {
-  template: 'afDocuments',
-  valueOut () {
-    return this.val()
-  },
-  valueIn (initialValue) {
-    return initialValue
-  }
-})
+import './autoform-documents.html'
 
 let extSchema
+let extMethods = {}
+
+const MethodNames = {
+  get: 'get',
+  insert: 'insert',
+  update: 'update',
+  remove: 'remove'
+}
 
 Template.afDocuments.onCreated(function () {
   const instance = this
   instance.state = new ReactiveDict()
+
   instance.state.set('listMode', false)
   if (instance.data.value) {
     instance.state.set('target', instance.data.value)
+  }
+
+  // create an instance id to distinct
+  // between the given external methods
+  const instanceId = Random.id()
+  extMethods[ instanceId ] = {}
+  instance.instanceId = instanceId
+
+  /**
+   * Adds a method by it's type.
+   * @param name one of get, insert, update, remove
+   * @param method the method to be called or used for Meteor.call
+   * @throws Error if type of method is neither
+   */
+  function addMethod (name, method) {
+    const methodTyoe = typeof method
+    if (methodTyoe === 'string') {
+      instance.state.set(`${name}DocMethodName`, method)
+    } else if (methodTyoe === 'function') {
+      extMethods[ instanceId ][ name ] = method
+    } else {
+      throw new Error(`[autoform-documents] unexpected method type [${method}] for [${name}]`)
+    }
+  }
+
+  function callMethod (methodType, argsObj, onResult) {
+    const callback = (err, res) => {
+      if (err) {
+        console.error(err)
+      } else {
+        onResult(res)
+      }
+    }
+    const extMeth = extMethods[ instanceId ][ methodType ]
+    if (extMeth) {
+      extMeth(argsObj, callback)
+    } else {
+      const methodName = instance.state.get(`${methodType}DocMethodName`)
+      Meteor.call(methodName, argsObj, callback())
+    }
+  }
+
+  instance.callMethod = callMethod
+
+  // add the required methods for
+  // retrieving and manipulating
+  // the dependant collection
+  const { methods } = instance.data.atts
+  addMethod(MethodNames.get, methods.get)
+  addMethod(MethodNames.insert, methods.insert)
+  addMethod(MethodNames.update, methods.update)
+
+  // keep remove optional as this
+  // is rather unusual to do within a form
+  if (methods.remove) {
+    addMethod(MethodNames.remove, methods.remove)
   }
 
   instance.autorun(() => {
@@ -40,19 +95,18 @@ Template.afDocuments.onCreated(function () {
 
     const data = Template.currentData()
     const { atts } = data
-    const { methods } = atts
 
     extSchema = new SimpleSchema(atts.schema, { tracker: Tracker })
     instance.state.set('label', atts.label)
+    instance.state.set('firstOption', atts.firstOption)
     instance.state.set('selectOptions', data.selectOptions)
     instance.state.set('dataSchemaKey', atts[ 'data-schema-key' ])
-    instance.state.set('collectionName', atts.collection)
-    instance.state.set('getDocMethodName', methods.get)
-    instance.state.set('insertDocMethodName', methods.insert)
-    instance.state.set('updateDocMethodName', methods.update)
-    instance.state.set('firstOption', atts.firstOption)
     instance.state.set('loadComplete', true)
   })
+})
+
+Template.afDocuments.onDestroyed(function onAfDocumentsDestroyed () {
+  delete extMethods[ this.instanceId ]
 })
 
 Template.afDocuments.helpers({
@@ -130,15 +184,10 @@ Template.afDocuments.events({
     event.stopPropagation()
     const targetId = $(event.currentTarget).attr('data-target')
     templateInstance.state.set('insertTarget', false)
-    const getDocMethodName = templateInstance.state.get('getDocMethodName')
-    Meteor.call(getDocMethodName, { _id: targetId }, (err, res) => {
-      if (err) {
-        console.error(err)
-      } else {
-        templateInstance.state.set('editTarget', res)
-      }
+    templateInstance.callMethod(MethodNames.get, { _id: targetId }, editTarget => {
+      templateInstance.state.set('editTarget', editTarget)
+      $('.afDocumentsFormModal').modal('show')
     })
-    $('.afDocumentsFormModal').modal('show')
   },
   'click .afDocumentsApplyButton' (event, templateInstance) {
     event.preventDefault()
@@ -158,32 +207,22 @@ Template.afDocuments.events({
   'submit #afDocumentsExternalDocInsertForm' (event, templateInstance) {
     event.preventDefault()
     const values = AutoForm.getFormValues('afDocumentsExternalDocInsertForm')
-    const insertMethodName = templateInstance.state.get('insertDocMethodName')
-    Meteor.call(insertMethodName, values.insertDoc, (err, docId) => {
-      if (err) {
-        console.error(err)
-      } else {
-        templateInstance.state.set('updated', true)
-        templateInstance.state.set('target', docId)
-        templateInstance.state.set('insertTarget', false)
-        templateInstance.state.set('listMode', false)
-        $('.afDocumentsFormModal').modal('hide')
-      }
+    templateInstance.callMethod(MethodNames.insert, values.insertDoc, docId => {
+      templateInstance.state.set('updated', true)
+      templateInstance.state.set('target', docId)
+      templateInstance.state.set('insertTarget', false)
+      templateInstance.state.set('listMode', false)
+      $('.afDocumentsFormModal').modal('hide')
     })
   },
   'submit #afDocumentsExternalDocEditForm' (event, templateInstance) {
     event.preventDefault()
     const values = AutoForm.getFormValues('afDocumentsExternalDocEditForm')
     const editTarget = templateInstance.state.get('editTarget')
-    const updateMethodName = templateInstance.state.get('updateDocMethodName')
-    Meteor.call(updateMethodName, { _id: editTarget._id, modifier: values.updateDoc }, (err, res) => {
-      if (err) {
-        console.error(err)
-      } else {
-        templateInstance.state.set('editTarget', null)
-        templateInstance.state.set('updated', true)
-        $('.afDocumentsFormModal').modal('hide')
-      }
+    templateInstance.callMethod(MethodNames.update, { _id: editTarget._id, modifier: values.updateDoc }, () => {
+      templateInstance.state.set('editTarget', null)
+      templateInstance.state.set('updated', true)
+      $('.afDocumentsFormModal').modal('hide')
     })
   }
 })
