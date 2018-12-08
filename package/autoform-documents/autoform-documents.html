@@ -18,7 +18,7 @@
     {{else}}
         {{#unless listMode}}
             <div class="border-top">
-                <ul class="list-group border-0">
+                <ul class="list-group {{#if invalid}}border border-danger text{{else}}border-0{{/if}}">
                     {{#with target}}
                         <li class="list-group-item {{#if disabled}}disabled{{else}}afDocumentsClickable afDocumentsFirstOption{{/if}}">
                             {{#unless disabled}}{{> afDocumentsAddButton}}{{/unless}}
@@ -36,7 +36,7 @@
                 </ul>
             </div>
         {{else}}
-            <div class="border-top border-right border-bottom afDocumentsScrollContainer">
+            <div class="border-top border-right border-bottom afDocumentsScrollContainer {{#if invalid}}border border-danger{{/if}}">
                 <ul class="list-group afDocumentsListGroup afDocumentsList">
                     <li class="list-group-item afDocumentsClickable afDocumentsSelectButtons afDocumentsUnselect text-muted">
                         {{> afDocumentsAddButton}}
@@ -99,7 +99,7 @@
                                 {{/each}}
                             {{/autoForm}}
                         </div>
-                        <div class="modal-footer">
+                        <div class="modal-footer clearfix">
                             <button type="submit"
                                     disabled="{{#if this.disabled}}disabled{{/if}}"
                                     class="{{this.buttonClasses}}"
@@ -113,7 +113,10 @@
                 </div>
             </div>
         </div>
+        <div class="help-block text-danger" hidden="{{#unless invalid}}hidden{{/unless}}">
+            <small>{{afFieldMessage name=name}}</small>
+        </div>
         <!-- autoform related -->
-        <input type="hidden" id="afDocumentHiddenInput" data-schema-key="{{dataSchemaKey}}"/>
+        <input type="hidden" class="afDocumentHiddenInput" data-schema-key="{{dataSchemaKey}}"/>
     {{/unless}}
 </template>

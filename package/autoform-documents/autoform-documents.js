@@ -34,7 +34,7 @@ const Buttons = {
 Template.afDocuments.onCreated(function () {
   const instance = this
   instance.state = new ReactiveDict()
-
+  instance.state.set('name', instance.data.name)
   instance.state.set('listMode', false)
   if (instance.data.value) {
     instance.state.set('target', instance.data.value)
@@ -105,7 +105,8 @@ Template.afDocuments.onCreated(function () {
     }
     const data = Template.currentData()
     const { atts } = data
-
+console.log(data)
+    instance.state.set('invalid', atts.class && atts.class.indexOf('invalid') > -1)
     instance.state.set('disabled', atts.hasOwnProperty('disabled'))
     instance.state.set('label', atts.label)
     instance.state.set('firstOption', atts.firstOption)
@@ -120,6 +121,12 @@ Template.afDocuments.onDestroyed(function onAfDocumentsDestroyed () {
 })
 
 Template.afDocuments.helpers({
+  name ()  {
+    return Template.instance().state.get('name')
+  },
+  invalid () {
+    return Template.instance().state.get('invalid')
+  },
   instanceId () {
     return Template.instance().state.get('instanceId')
   },
@@ -223,7 +230,7 @@ Template.afDocuments.events({
     templateInstance.state.set('editTarget', null)
     templateInstance.state.set('insertTarget', false)
     templateInstance.state.set('target', null)
-    templateInstance.$('#afDocumentHiddenInput').val(null)
+    templateInstance.$('.afDocumentHiddenInput').val(null)
   },
   'click .afDocumentsEditButton' (event, templateInstance) {
     event.preventDefault()
@@ -242,7 +249,8 @@ Template.afDocuments.events({
   'click .afDocumentsEntry' (event, templateInstance) {
     event.preventDefault()
     const value = $(event.currentTarget).attr('data-target')
-    templateInstance.$('#afDocumentHiddenInput').val(value)
+    console.log(value)
+    templateInstance.$('.afDocumentHiddenInput').val(value)
     templateInstance.state.set('target', value)
   },
   'click .afDocumentsSelectButtons' (event, templateInstance) {
@@ -252,7 +260,7 @@ Template.afDocuments.events({
   },
   'submit #afDocumentsExternalDocInsertForm' (event, templateInstance) {
     event.preventDefault()
-    const insertDoc = formIsValid(extSchema, 'afDocumentsExternalDocInsertForm')
+    const insertDoc = formIsValid(extSchema[templateInstance.instanceId], 'afDocumentsExternalDocInsertForm')
     if (!insertDoc) return
 
     templateInstance.callMethod(MethodNames.insert, insertDoc, docId => {
@@ -260,13 +268,14 @@ Template.afDocuments.events({
       templateInstance.state.set('target', docId)
       templateInstance.state.set('insertTarget', false)
       templateInstance.state.set('listMode', false)
+      templateInstance.$('.afDocumentHiddenInput').val(docId)
       templateInstance.$('.afDocumentsFormModal').modal('hide')
     })
   },
   'submit #afDocumentsExternalDocEditForm' (event, templateInstance) {
     event.preventDefault()
 
-    const updateDoc = formIsValid(extSchema, 'afDocumentsExternalDocEditForm', true)
+    const updateDoc = formIsValid(extSchema[templateInstance.instanceId], 'afDocumentsExternalDocEditForm', true)
     if (!updateDoc) return
 
     const editTarget = templateInstance.state.get('editTarget')
