@@ -20,6 +20,17 @@ const MethodNames = {
   remove: 'remove'
 }
 
+const Buttons = {
+  insert: {
+    label: 'Create',
+    classes: 'btn btn-success'
+  },
+  update: {
+    label: 'Submit',
+    classes: 'btn btn-primary'
+  }
+}
+
 Template.afDocuments.onCreated(function () {
   const instance = this
   instance.state = new ReactiveDict()
@@ -96,6 +107,7 @@ Template.afDocuments.onCreated(function () {
     const { atts } = data
 
     extSchema = new SimpleSchema(atts.schema, { tracker: Tracker })
+
     instance.state.set('label', atts.label)
     instance.state.set('firstOption', atts.firstOption)
     instance.state.set('selectOptions', data.selectOptions)
@@ -156,6 +168,27 @@ Template.afDocuments.helpers({
   },
   extSchema () {
     return extSchema
+  },
+  afDocumentsEditContext () {
+    const instance = Template.instance()
+    const buttons = instance.data.atts.buttons
+    const updateButton = Object.assign({}, Buttons.update, (buttons && buttons.update))
+
+    return {
+      schema: extSchema,
+      doc: instance.state.get('editTarget'),
+      buttonClasses: updateButton.classes,
+      buttonContent: updateButton.label
+    }
+  },
+  afDocumentsInsertContext () {
+    const buttons = Template.instance().data.atts.buttons
+    const insertButton = Object.assign({}, Buttons.insert, (buttons && buttons.insert))
+    return {
+      schema: extSchema,
+      buttonClasses: insertButton.classes,
+      buttonContent: insertButton.label
+    }
   }
 })
 

@@ -8,9 +8,9 @@
 
 <template name="afDocuments">
     {{#unless loadComplete}}
-            <p class="text-center">
-                <i class="fa fa-fw fa-spinner fa-pulse"></i>
-            </p>
+        <p class="text-center">
+            <i class="fa fa-fw fa-spinner fa-pulse"></i>
+        </p>
     {{else}}
         {{#unless listMode}}
             <div class="border-top">
@@ -85,10 +85,23 @@
                     </div>
                     <div class="modal-body">
                         {{#if editTarget}}
-                            {{> quickForm id="afDocumentsExternalDocEditForm" schema=extSchema type="normal" doc=editTarget}}
+                            {{#with afDocumentsEditContext}}
+                                {{> quickForm id="afDocumentsExternalDocEditForm"
+                                        type="normal"
+                                        doc=this.doc
+                                        schema=this.schema
+                                        buttonClasses=this.buttonClasses
+                                        buttonContent=this.buttonContent}}
+                            {{/with}}
                         {{/if}}
                         {{#if insertTarget}}
-                            {{> quickForm id="afDocumentsExternalDocInsertForm" schema=extSchema type="normal"}}
+                            {{#with afDocumentsInsertContext}}
+                                {{> quickForm id="afDocumentsExternalDocInsertForm"
+                                        type="normal"
+                                        schema=this.schema
+                                        buttonClasses=this.buttonClasses
+                                        buttonContent=this.buttonContent}}
+                            {{/with}}
                         {{/if}}
                     </div>
                     <div class="modal-footer"></div>
