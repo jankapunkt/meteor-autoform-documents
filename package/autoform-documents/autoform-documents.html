@@ -45,10 +45,12 @@
                             <li class="list-group-item list-group-item-primary clearfix afDocumentsClickable li-{{this.value}}"
                                 data-target="{{this.value}}" data-label="{{this.label}}">
                                 <span class="float-right">
-                                    <button class="afDocumentsEditButton btn btn-sm btn-secondary" data-target="{{this.value}}">
+                                    <button class="afDocumentsEditButton btn btn-sm btn-secondary"
+                                            data-target="{{this.value}}">
                                         <i class="fa fa-fw fa-pencil"></i>
                                     </button>
-                                    <button class="afDocumentsApplyButton btn btn-sm btn-primary" data-target="{{this.value}}">
+                                    <button class="afDocumentsApplyButton btn btn-sm btn-primary"
+                                            data-target="{{this.value}}">
                                         <i class="fa fa-fw fa-check"></i>
                                     </button>
                                     </span>
@@ -70,30 +72,34 @@
                 </ul>
             </div>
         {{/unless}}
-    {{/unless}}
-    <!-- Modal -->
-    <div class="afDocumentsFormModal modal fade" role="dialog">
-        <div class="modal-dialog modal-lg">
 
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <strong>{{label}}</strong>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <!-- Modal -->
+        <div class="afDocumentsFormModal modal fade" id="afDocumentsFormModal" tabindex="-1" role="dialog"
+             aria-labelledby="afDocumentsFormModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="afDocumentsFormModalLabel">{{label}}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {{#if editTarget}}
+                            {{> quickForm id="afDocumentsExternalDocEditForm" schema=extSchema type="normal" doc=editTarget}}
+                        {{/if}}
+                        {{#if insertTarget}}
+                            {{> quickForm id="afDocumentsExternalDocInsertForm" schema=extSchema type="normal"}}
+                        {{/if}}
+                    </div>
+                    <div class="modal-footer"></div>
                 </div>
-                <div class="modal-body">
-                    {{#if editTarget}}
-                        {{> quickForm id="afDocumentsExternalDocEditForm" schema=extSchema type="normal" doc=editTarget}}
-                    {{/if}}
-                    {{#if insertTarget}}
-                        {{> quickForm id="afDocumentsExternalDocInsertForm" schema=extSchema type="normal"}}
-                    {{/if}}
-                </div>
-                <div class="modal-footer"></div>
+
             </div>
-
         </div>
-    </div>
-    <!-- autoform related -->
-    <input type="hidden" id="afDocumentHiddenInput" data-schema-key="{{dataSchemaKey}}"/>
+        <!-- autoform related -->
+        <input type="hidden" id="afDocumentHiddenInput" data-schema-key="{{dataSchemaKey}}"/>
+    {{/unless}}
 </template>
