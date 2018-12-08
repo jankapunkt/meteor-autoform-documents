@@ -109,6 +109,11 @@ To prevent the bug, you need to add the following line to your application's CSS
 
 ## Changelog
 
+**1.4.1**
+
+* delete also existing schemas by instanceId in onDestroyed
+* fix existing value not set to hidden input bug using onRendered
+
 **1.4.0**
 
 * invalid state handling added
