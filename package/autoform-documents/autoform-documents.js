@@ -10,8 +10,8 @@ import SimpleSchema from 'simpl-schema'
 import './autoform-documents.css'
 import './autoform-documents.html'
 
-let extSchema
-let extMethods = {}
+const extSchema = {}
+const extMethods = {}
 
 const MethodNames = {
   get: 'get',
@@ -45,6 +45,7 @@ Template.afDocuments.onCreated(function () {
   const instanceId = Random.id()
   extMethods[ instanceId ] = {}
   instance.instanceId = instanceId
+  extSchema[ instanceId ] = new SimpleSchema(instance.data.atts.schema, { tracker: Tracker })
 
   /**
    * Adds a method by it's type.
@@ -102,12 +103,10 @@ Template.afDocuments.onCreated(function () {
     if (updated) {
       instance.state.set('updated', false)
     }
-
     const data = Template.currentData()
     const { atts } = data
 
-    extSchema = new SimpleSchema(atts.schema, { tracker: Tracker })
-
+    instance.state.set('disabled', atts.hasOwnProperty('disabled'))
     instance.state.set('label', atts.label)
     instance.state.set('firstOption', atts.firstOption)
     instance.state.set('selectOptions', data.selectOptions)
@@ -121,6 +120,9 @@ Template.afDocuments.onDestroyed(function onAfDocumentsDestroyed () {
 })
 
 Template.afDocuments.helpers({
+  instanceId () {
+    return Template.instance().state.get('instanceId')
+  },
   loadComplete () {
     return Template.instance().state.get('loadComplete')
   },
@@ -135,6 +137,9 @@ Template.afDocuments.helpers({
   },
   dataSchemaKey () {
     return Template.instance().state.get('dataSchemaKey')
+  },
+  disabled () {
+    return Template.instance().state.get('disabled')
   },
   listMode () {
     const instance = Template.instance()
@@ -160,34 +165,43 @@ Template.afDocuments.helpers({
     const selectOptions = Template.instance().state.get('selectOptions')
     return selectOptions.find(entry => entry.value === target)
   },
-  insertTarget () {
-    return Template.instance().state.get('insertTarget')
-  },
-  editTarget () {
-    return Template.instance().state.get('editTarget')
-  },
-  extSchema () {
-    return extSchema
-  },
-  afDocumentsEditContext () {
+
+  afDocumentsFormContext () {
     const instance = Template.instance()
+    const editTarget = instance.state.get('editTarget')
+    const insertTarget = instance.state.get('insertTarget')
+    const disabled = instance.state.get('disabled')
+    const formType = disabled ? 'disabled' : 'normal'
+
+    let formId, type
+
+    if (!editTarget && !insertTarget) {
+      return null
+    } else if (editTarget && insertTarget) {
+      throw new Error('[autoform-documents] unexpected editTarget and insertTarget')
+    }
+
+    if (insertTarget) {
+      formId = 'afDocumentsExternalDocInsertForm'
+      type = MethodNames.insert
+    }
+
+    if (editTarget) {
+      formId = 'afDocumentsExternalDocEditForm'
+      type = MethodNames.update
+    }
+
     const buttons = instance.data.atts.buttons
-    const updateButton = Object.assign({}, Buttons.update, (buttons && buttons.update))
+    const targetButton = Object.assign({}, Buttons[ type ], (buttons && buttons[ type ]))
 
     return {
-      schema: extSchema,
-      doc: instance.state.get('editTarget'),
-      buttonClasses: updateButton.classes,
-      buttonContent: updateButton.label
-    }
-  },
-  afDocumentsInsertContext () {
-    const buttons = Template.instance().data.atts.buttons
-    const insertButton = Object.assign({}, Buttons.insert, (buttons && buttons.insert))
-    return {
-      schema: extSchema,
-      buttonClasses: insertButton.classes,
-      buttonContent: insertButton.label
+      id: formId,
+      disabled: disabled,
+      formType: formType,
+      doc: editTarget,
+      schema: extSchema[instance.instanceId],
+      buttonClasses: targetButton.classes,
+      buttonContent: targetButton.label
     }
   }
 })
@@ -202,14 +216,14 @@ Template.afDocuments.events({
     event.stopPropagation()
     templateInstance.state.set('editTarget', null)
     templateInstance.state.set('insertTarget', true)
-    $('.afDocumentsFormModal').modal('show')
+    templateInstance.$('.afDocumentsFormModal').modal('show')
   },
   'click .afDocumentsUnselect' (event, templateInstance) {
     event.preventDefault()
     templateInstance.state.set('editTarget', null)
     templateInstance.state.set('insertTarget', false)
     templateInstance.state.set('target', null)
-    $('#afDocumentHiddenInput').val(null)
+    templateInstance.$('#afDocumentHiddenInput').val(null)
   },
   'click .afDocumentsEditButton' (event, templateInstance) {
     event.preventDefault()
@@ -218,7 +232,7 @@ Template.afDocuments.events({
     templateInstance.state.set('insertTarget', false)
     templateInstance.callMethod(MethodNames.get, { _id: targetId }, editTarget => {
       templateInstance.state.set('editTarget', editTarget)
-      $('.afDocumentsFormModal').modal('show')
+      templateInstance.$('.afDocumentsFormModal').modal('show')
     })
   },
   'click .afDocumentsApplyButton' (event, templateInstance) {
@@ -228,7 +242,7 @@ Template.afDocuments.events({
   'click .afDocumentsEntry' (event, templateInstance) {
     event.preventDefault()
     const value = $(event.currentTarget).attr('data-target')
-    $('#afDocumentHiddenInput').val(value)
+    templateInstance.$('#afDocumentHiddenInput').val(value)
     templateInstance.state.set('target', value)
   },
   'click .afDocumentsSelectButtons' (event, templateInstance) {
@@ -246,11 +260,12 @@ Template.afDocuments.events({
       templateInstance.state.set('target', docId)
       templateInstance.state.set('insertTarget', false)
       templateInstance.state.set('listMode', false)
-      $('.afDocumentsFormModal').modal('hide')
+      templateInstance.$('.afDocumentsFormModal').modal('hide')
     })
   },
   'submit #afDocumentsExternalDocEditForm' (event, templateInstance) {
     event.preventDefault()
+
     const updateDoc = formIsValid(extSchema, 'afDocumentsExternalDocEditForm', true)
     if (!updateDoc) return
 
@@ -258,7 +273,7 @@ Template.afDocuments.events({
     templateInstance.callMethod(MethodNames.update, { _id: editTarget._id, modifier: updateDoc }, () => {
       templateInstance.state.set('editTarget', null)
       templateInstance.state.set('updated', true)
-      $('.afDocumentsFormModal').modal('hide')
+      templateInstance.$('.afDocumentsFormModal').modal('hide')
     })
   }
 })
