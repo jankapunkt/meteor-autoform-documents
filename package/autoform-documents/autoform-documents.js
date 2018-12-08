@@ -128,6 +128,7 @@ Template.afDocuments.onRendered(function onAfDocumentsRendered () {
 
 Template.afDocuments.onDestroyed(function onAfDocumentsDestroyed () {
   delete extMethods[ this.instanceId ]
+  delete extSchema[ this.instanceId ]
 })
 
 Template.afDocuments.helpers({
