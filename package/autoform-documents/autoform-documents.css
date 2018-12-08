@@ -2,10 +2,6 @@
     cursor: pointer;
 }
 
-.afDocumentsCard {
-    border: 0px;
-}
-
 .afDocumentsScrollContainer {
     max-height: 500px;
     margin-bottom: 10px;
@@ -13,3 +9,5 @@
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
 }
+
+.list-group-item, .list-group-item:hover{ z-index: auto; }
